@@ -2,13 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from random import random
 from utils import *
+import math
+import time
 
-def generate_points(n):
-    x = 20.
+def generate_points(n, size):
     points = list()
     for i in range(n):
-        x = (random()-0.5)*x*2
-        y = (random()-0.5)*x*2
+        x = (2*random() - 1)*size
+        y = (2*random() - 1)*size
         points.append(np.array([x,y]))
     return points
 
@@ -32,7 +33,7 @@ def formation_wedge6():
     return [p1,p2,p3,p4,p5,p6]
 
 
-def shake(r, rf):
+def shake(r, rf, half_thickness):
     assert len(r)==len(rf)
     s = len(r)
     perms = list(permutations(range(s)))
@@ -44,7 +45,11 @@ def shake(r, rf):
         for k in range(s):
             p1 = r[perm[k]]
             p2 = rf[k]
-            lines.append([p1, p2])
+            # lines.append([p1, p2])
+            line_left, line_right = get_double_line([p1, p2], half_thickness)
+            lines.append(line_left)
+            lines.append(line_right)
+
         k = count_intersections(lines)
         w = calc_weigt_func(lines)
         # if k == 0:
@@ -60,6 +65,38 @@ def shake(r, rf):
             best_perm = perm
             min_w = w
     return min_k, min_w, best_perm
+
+
+def get_double_line(center_line, half_thickness):
+    x1 = center_line[0][0]
+    y1 = center_line[0][1]
+
+    x2 = center_line[1][0]
+    y2 = center_line[1][1]
+
+    dx = x2 - x1
+    dy = y2 - y1
+
+    length = math.sqrt(dx * dx + dy * dy)
+
+    n1 = np.array([-dy, dx]) / length
+    n2 = np.array([dy, -dx]) / length
+
+    xleft1 = x1 + n1[0] * half_thickness
+    xright1 = x1 + n2[0] * half_thickness
+
+    yleft1 = y1 + n1[1] * half_thickness
+    yright1 = y1 + n2[1] * half_thickness
+    xleft2 = x2 + n1[0] * half_thickness
+    xright2 = x2 + n2[0] * half_thickness
+
+    yleft2 = y2 + n1[1] * half_thickness
+    yright2 = y2 + n2[1] * half_thickness
+
+    l1 = [np.array([xleft1, yleft1]), np.array([xleft2, yleft2])]
+    l2 = [np.array([xright1, yright1]), np.array([xright2, yright2])]
+
+    return l1, l2
 
 
 def count_intersections(lines):
@@ -78,20 +115,24 @@ def calc_weigt_func(lines):
     for line1 in lines:
         p1 = line1[0]
         p2 = line1[1]
-        w = np.linalg.norm(p1 - p2)
+        w += np.linalg.norm(p1 - p2)
     return w
 
 
-rf = formation_wedge6()
-r = formation_square6(5)
-# rf = generate_points(6)
+rf = formation_square6(2)
+r = generate_points(6, 5)
+
+
+
 for p in r:
     plt.plot(p[0],p[1], 'k+')
 for p in rf:
     plt.plot(p[0],p[1], 'ro')
 
-k, w, perm = shake(r, rf)
-# print(k)
+t_start = time.time()
+k, w, perm = shake(r, rf, 0.1)
+print "time: " + str(time.time() - t_start)
+
 for i in range(len(r)):
     x1 = rf[i][0]
     y1 = rf[i][1]
@@ -99,6 +140,6 @@ for i in range(len(r)):
     y2 = r[perm[i]][1]
     plt.plot([x1, x2], [y1, y2], 'm--')
 
-plt.xlim([-10, 10])
-plt.ylim([-10, 10])
+plt.xlim([-6, 6])
+plt.ylim([-6, 6])
 plt.show()

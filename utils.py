@@ -52,6 +52,8 @@ def inf_check(p1, p2):
         p2[0] += eps/2
     return p1, p2
 
+
+
 # p1 = np.array( [-1.,0.])
 # p2 = np.array( [1., 0.])
 # q1 = np.array( [0.,-1.])
