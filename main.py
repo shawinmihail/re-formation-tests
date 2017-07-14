@@ -46,9 +46,15 @@ def shake(r, rf, half_thickness):
             p1 = r[perm[k]]
             p2 = rf[k]
             # lines.append([p1, p2])
-            line_left, line_right = get_double_line([p1, p2], half_thickness)
-            lines.append(line_left)
-            lines.append(line_right)
+
+            line_left, line_right = get_double_line(p1, p2, half_thickness)
+
+
+            if line_left is not None:
+                lines.append(line_left)
+
+            if line_right is not None:
+                lines.append(line_right)
 
         k = count_intersections(lines)
         w = calc_weigt_func(lines)
@@ -67,34 +73,29 @@ def shake(r, rf, half_thickness):
     return min_k, min_w, best_perm
 
 
-def get_double_line(center_line, half_thickness):
-    x1 = center_line[0][0]
-    y1 = center_line[0][1]
+def get_double_line(p1, p2, half_thickness):
 
-    x2 = center_line[1][0]
-    y2 = center_line[1][1]
+    dp = p2 - p1
 
-    dx = x2 - x1
-    dy = y2 - y1
+    dx = dp[0]
+    dy = dp[1]
 
     length = math.sqrt(dx * dx + dy * dy)
+
+    if length == 0:
+        return None, None
 
     n1 = np.array([-dy, dx]) / length
     n2 = np.array([dy, -dx]) / length
 
-    xleft1 = x1 + n1[0] * half_thickness
-    xright1 = x1 + n2[0] * half_thickness
+    p1_left = p1 + n1 * half_thickness
+    p1_right = p1 + n2 * half_thickness
 
-    yleft1 = y1 + n1[1] * half_thickness
-    yright1 = y1 + n2[1] * half_thickness
-    xleft2 = x2 + n1[0] * half_thickness
-    xright2 = x2 + n2[0] * half_thickness
+    p2_left = p2 + n1 * half_thickness
+    p2_right = p2 + n2 * half_thickness
 
-    yleft2 = y2 + n1[1] * half_thickness
-    yright2 = y2 + n2[1] * half_thickness
-
-    l1 = [np.array([xleft1, yleft1]), np.array([xleft2, yleft2])]
-    l2 = [np.array([xright1, yright1]), np.array([xright2, yright2])]
+    l1 = [p1_left, p2_left]
+    l2 = [p1_right, p2_right]
 
     return l1, l2
 
@@ -118,28 +119,35 @@ def calc_weigt_func(lines):
         w += np.linalg.norm(p1 - p2)
     return w
 
+while True:
+    rf = formation_square6(2)
+    r = generate_points(6, 5)
+    # r = formation_wedge6()
 
-rf = formation_square6(2)
-r = generate_points(6, 5)
+    for p in r:
+        plt.plot(p[0],p[1], 'k+', markersize=10)
+    for p in rf:
+        plt.plot(p[0],p[1], 'ro')
 
+    line_thickness = 0.5
 
+    t_start = time.time()
+    k, w, perm = shake(r, rf, line_thickness / 2.)
+    print "Amount of intersections: " + str(k)
+    print "time: " + str(time.time() - t_start)
 
-for p in r:
-    plt.plot(p[0],p[1], 'k+')
-for p in rf:
-    plt.plot(p[0],p[1], 'ro')
+    for i in range(len(r)):
+        x1 = rf[i][0]
+        y1 = rf[i][1]
+        x2 = r[perm[i]][0]
+        y2 = r[perm[i]][1]
 
-t_start = time.time()
-k, w, perm = shake(r, rf, 0.1)
-print "time: " + str(time.time() - t_start)
+        line_left, line_right = get_double_line(np.array([x1, y1]), np.array([x2, y2]), line_thickness)
 
-for i in range(len(r)):
-    x1 = rf[i][0]
-    y1 = rf[i][1]
-    x2 = r[perm[i]][0]
-    y2 = r[perm[i]][1]
-    plt.plot([x1, x2], [y1, y2], 'm--')
+        plt.plot([x1, x2], [y1, y2], 'm--')
+        plt.plot([line_left[0][0], line_left[1][0]], [line_left[0][1], line_left[1][1]], 'm-')
+        plt.plot([line_right[0][0], line_right[1][0]], [line_right[0][1], line_right[1][1]], 'm-')
 
-plt.xlim([-6, 6])
-plt.ylim([-6, 6])
-plt.show()
+    plt.xlim([-6, 6])
+    plt.ylim([-6, 6])
+    plt.show()
