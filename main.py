@@ -133,8 +133,8 @@ while True:
 
     t_start = time.time()
     k, w, perm = shake(r, rf, line_thickness / 2.)
-    print "Amount of intersections: " + str(k)
-    print "time: " + str(time.time() - t_start)
+    print ("Amount of intersections: " + str(k))
+    print ("time: " + str(time.time() - t_start))
 
     for i in range(len(r)):
         x1 = rf[i][0]
