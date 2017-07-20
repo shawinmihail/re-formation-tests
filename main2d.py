@@ -33,18 +33,25 @@ black = (0, 0, 0)
 
 t_prev = time.time()
 
-x_desired = np.array([10, 10])
+x_desired1 = np.array([10, 10])
+x_desired2 = np.array([10, -10])
 
 
-copter = Copter.Copter(0, np.array([0, 0]), np.array([0, 0]), 1, 20)
-copterPainter = Copter.CopterPainter(copter, green, gameDisplay, (px_ratio, display_width, display_height), True)
+copter1 = Copter.Copter(0, np.array([0, 0]), np.array([0, 0]), 1, 20)
+copterPainter1 = Copter.CopterPainter(copter1, green, gameDisplay, (px_ratio, display_width, display_height), True)
+
+copter2 = Copter.Copter(1, np.array([0, 0]), np.array([0, 0]), 1, 20)
+copterPainter2 = Copter.CopterPainter(copter2, red, gameDisplay, (px_ratio, display_width, display_height), True)
 
 
 def update(dt):
 
-    accel = pid.get_prop_diff_control(copter.x, x_desired, copter.v)
-    copter.move(accel, dt)
-    copterPainter.draw()
+    accel1 = pid.get_prop_diff_control(copter1.x, x_desired1, copter1.v)
+    accel2 = pid.get_prop_diff_control(copter2.x, x_desired2, copter2.v)
+    copter1.move(accel1, dt)
+    copter2.move(accel2, dt)
+    copterPainter1.draw()
+    copterPainter2.draw()
 
 
 while not crashed:

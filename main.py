@@ -121,8 +121,8 @@ def calc_weigt_func(lines):
 
 while True:
     rf = formation_square6(2)
-    r = generate_points(6, 5)
-    # r = formation_wedge6()
+    # r = generate_points(6, 5)
+    r = formation_wedge6()
 
     for p in r:
         plt.plot(p[0],p[1], 'k+', markersize=10)
