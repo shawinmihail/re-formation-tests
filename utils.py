@@ -21,6 +21,7 @@ def seg_intersect(a1,a2, b1,b2):
         d = eps
     return (num / d)*db + b1
 
+
 def isIntersection(p1, p2, q1, q2):
     p1, p2 = inf_check(p1, p2)
     q1, q2 = inf_check(q1, q2)
