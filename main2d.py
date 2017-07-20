@@ -37,7 +37,7 @@ x_desired = np.array([10, 10])
 
 
 copter = Copter.Copter(0, np.array([0, 0]), np.array([0, 0]), 1, 20)
-copterPainter = Copter.CopterPainter(copter, green, gameDisplay, (px_ratio, display_width, display_height))
+copterPainter = Copter.CopterPainter(copter, green, gameDisplay, (px_ratio, display_width, display_height), True)
 
 
 def update(dt):
