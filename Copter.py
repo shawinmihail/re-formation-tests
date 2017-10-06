@@ -1,6 +1,7 @@
 import pygame
 import pygame_utils
-
+import pid.accel as pid
+import numpy as np
 
 class Copter:
     def __init__(self, id, x0, v0, mass, radius):
@@ -15,12 +16,20 @@ class Copter:
         self.v = v0
         self.mass = mass
         self.radius = radius
+        self.accel_pid = pid.AccelPIDRegulator()
 
-    def move(self, accel, dt):
+    def move_accel(self, accel, dt):
         self.x = self.x + self.v * dt + accel * dt * dt / float(2)
         self.v = self.v + accel * dt
-
         self.x_list.append(self.x)
+
+    def move_vel(self, vel, dt):
+
+        self.x = self.x + vel * dt
+        self.v = vel
+        self.x_list.append(self.x)
+        # vel_error = vel - self.v
+        # self.move_accel(np.array(self.accel_pid.get_accel_to_wp_px4(vel_error, dt)), dt)
 
 
 class CopterPainter:
